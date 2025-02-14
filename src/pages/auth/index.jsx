@@ -4,14 +4,96 @@ import Victory from "../../assets/victory.svg";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import apiClient from "@/lib/api-client";
+
+import { LOGIN_ROUTES, SIGNUP_ROUTES } from "@/utils/constant";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/store";
 
 const Auth = () => {
+  const navigate = useNavigate();
+  const { setUserInfo } = useAppStore();
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setconfirmPassword] = useState("");
 
-  const handleLogin = async () => {};
-  const handleSignup = async () => {};
+  const ValidateLogin = () => {
+    if (!email.length) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Password is required");
+      return false;
+    }
+
+    return true;
+  };
+
+  const ValidateSignup = () => {
+    if (!email.length) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!ValidateLogin()) return;
+
+    try {
+      console.log("Sending login request to:", LOGIN_ROUTES);
+      const response = await apiClient.post(
+        LOGIN_ROUTES,
+        { email, password },
+        { withCredentials: true }
+      );
+      if (response.data.user.id) {
+        setUserInfo(response.data.user);
+        if (response.data.user.profileSetup) navigate("/chat");
+        else navigate("/profile");
+      }
+      console.log("Login successful:", response.data);
+      toast.success("Login successful!");
+    } catch (error) {
+      console.error("Login Error:", error);
+      toast.error(error.response?.data?.message || "Login failed");
+    }
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!ValidateSignup()) return;
+
+    try {
+      console.log("Sending signup request to:", SIGNUP_ROUTES);
+      const response = await apiClient.post(
+        SIGNUP_ROUTES,
+        { email, password },
+        { withCredentials: true }
+      );
+      if (response.status === 201) {
+        setUserInfo(response.data.user);
+        navigate("/profile");
+      }
+      console.log("Signup successful:", response);
+      alert("done");
+    } catch (error) {
+      console.error("Signup Error:", error);
+      toast.error(error.response?.data?.message || "Signup failed");
+    }
+  };
 
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
@@ -27,7 +109,7 @@ const Auth = () => {
             </p>
           </div>
           <div className="flex items-center justify-center w-full">
-            <Tabs className="w-3/4">
+            <Tabs className="w-3/4" defaultValue="login">
               <TabsList className="bg-transparent w-full rounded-none">
                 <TabsTrigger
                   value="login"
@@ -47,15 +129,15 @@ const Auth = () => {
                   placeholder="Email"
                   type="email"
                   className="rounded-full p-6 "
-                  vlaue={email}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={email}
+                  onChange={(e) => setemail(e.target.value)}
                 />
                 <Input
                   placeholder="Password"
                   type="password"
                   className="rounded-full p-6 "
-                  vlaue={password}
-                  onChange={(e) => setemail(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Button className="rounded-full p-6" onClick={handleLogin}>
                   Login
@@ -66,21 +148,21 @@ const Auth = () => {
                   placeholder="Email"
                   type="email"
                   className="rounded-full p-6 "
-                  vlaue={email}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={email}
+                  onChange={(e) => setemail(e.target.value)}
                 />
                 <Input
                   placeholder="Password"
                   type="password"
                   className="rounded-full p-6 "
-                  vlaue={password}
-                  onChange={(e) => setemail(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Input
                   placeholder="ConfirmPassword"
                   type="password"
                   className="rounded-full p-6 "
-                  vlaue={confirmPassword}
+                  value={confirmPassword}
                   onChange={(e) => setconfirmPassword(e.target.value)}
                 />
                 <Button className="rounded-full p-6" onClick={handleSignup}>
