@@ -1,11 +1,17 @@
+import { useAppStore } from "@/store";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Chat = () => {
-  return (
-    <div>
-      <h1>Chat</h1>
-    </div>
-  );
+  const { userInfo } = useAppStore();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userInfo.profileSetup) {
+      toast("Please setup your profile");
+      navigate("/profile");
+    }
+  }, [userInfo, navigate]);
+  return <div>Chat</div>;
 };
 
 export default Chat;
