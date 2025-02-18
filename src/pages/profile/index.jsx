@@ -12,6 +12,8 @@ import apiClient from "@/lib/api-client";
 import {
   UPDATE_PROFILE_ROUTE,
   ADD_PROFILE_IMAGE_ROUTE,
+  HOST,
+  REMOVE_PROFILE_IMAGE_ROUTE,
 } from "@/utils/constant";
 
 const Profile = () => {
@@ -29,6 +31,16 @@ const Profile = () => {
       setFirstName(userInfo.firstName);
       setLastName(userInfo.lastName);
       setSelectedColor(userInfo.color);
+    }
+    if (userInfo.image) {
+      // Modified image URL construction
+      const imageUrl = userInfo.image.startsWith("http")
+        ? userInfo.image
+        : `${HOST}/${userInfo.image.replace(/^\/+/, "")}`; // Remove leading slashes
+      console.log("Constructed image URL:", imageUrl); // For debugging
+      setImage(imageUrl);
+    } else {
+      setImage(null);
     }
   }, [userInfo]);
 
@@ -79,34 +91,59 @@ const Profile = () => {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("profile-image", file);
+
       try {
         const response = await apiClient.post(
           ADD_PROFILE_IMAGE_ROUTE,
           formData,
           {
             withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
+
         if (response.status === 200 && response.data.image) {
+          // Modified image URL construction for uploaded image
+          const newImageUrl = response.data.image.startsWith("http")
+            ? response.data.image
+            : `${HOST}/${response.data.image.replace(/^\/+/, "")}`;
+
+          console.log("New image URL:", newImageUrl); // For debugging
+          setImage(newImageUrl);
           setUserInfo({ ...userInfo, image: response.data.image });
           toast.success("Profile image updated successfully");
         }
-        // const reader = new FileReader();
-        // reader.onload = () => {
-        //   setImage(reader.result);
-        // };
-        // reader.readAsDataURL(file);
       } catch (error) {
-        toast.error("Failed to upload image");
+        console.error("Upload error:", error);
+        toast.error(error.response?.data?.message || "Failed to upload image");
       }
     }
   };
 
   const handleDeleteImage = async () => {
-    setUserInfo({ ...userInfo, image: null });
-    toast.success("Profile image removed");
+    try {
+      const response = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        setUserInfo({ ...userInfo, image: null });
+        setImage(null);
+        toast.success("Profile image removed successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error(error.response?.data?.message || "Failed to delete image");
+    }
   };
 
   return (
