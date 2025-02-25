@@ -1,69 +1,64 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Auth from "./pages/auth";
-import Chat from "./pages/chat";
-import Profile from "./pages/profile";
-import apiClient from "./lib/api-client";
-import { GET_USER_INFO } from "./utils/constant";
-import { useAppStore } from "./store";
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Profile from "@/pages/profile";
+import Chat from "@/pages/chat";
+import Auth from "@/pages/auth";
+import apiClient from "@/lib/api-client";
+import { GET_USERINFO_ROUTE } from "@/lib/constants";
+import { useAppStore } from "@/store";
 
 const PrivateRoute = ({ children }) => {
   const { userInfo } = useAppStore();
-  return userInfo ? children : <Navigate to="/auth" />;
+  const isAuthenticated = !!userInfo;
+  return isAuthenticated ? children : <Navigate to="/auth" />;
 };
 
 const AuthRoute = ({ children }) => {
   const { userInfo } = useAppStore();
-  return userInfo ? <Navigate to="/chat" /> : children;
+  const isAuthenticated = !!userInfo;
+  return isAuthenticated ? <Navigate to="/chat" /> : children;
 };
 
-const App = () => {
+function App() {
   const { userInfo, setUserInfo } = useAppStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        console.log("Fetching user data...");
-
-        const response = await apiClient.get(GET_USER_INFO, {
+        const response = await apiClient.get(GET_USERINFO_ROUTE, {
           withCredentials: true,
         });
-
-        console.log("Response:", response);
-
         if (response.status === 200 && response.data.id) {
           setUserInfo(response.data);
         } else {
-          setUserInfo(null);
+          setUserInfo(undefined);
         }
-      } catch (err) {
-        console.error("Error fetching user data:", err);
-        setUserInfo(null);
+      } catch (error) {
+        setUserInfo(undefined);
       } finally {
         setLoading(false);
       }
     };
 
-    // Fetch user data only once
     if (!userInfo) {
       getUserData();
     } else {
       setLoading(false);
     }
-  }, []); // ✅ Prevents infinite loop
-
-  // Debugging frontend cookies
-  useEffect(() => {
-    console.log("Frontend Cookies:", document.cookie);
-  });
+  }, [userInfo, setUserInfo]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // Show a loading indicator while fetching user data
   }
 
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route
           path="/auth"
@@ -91,8 +86,8 @@ const App = () => {
         />
         <Route path="*" element={<Navigate to="/auth" />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-};
+}
 
 export default App;
