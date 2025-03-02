@@ -32,7 +32,7 @@ function App() {
     const getUserData = async () => {
       try {
         const response = await apiClient.get(GET_USERINFO_ROUTE, {
-          withCredentials: true,
+          withCredentials: include,
         });
         if (response.status === 200 && response.data.id) {
           setUserInfo(response.data);

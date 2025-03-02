@@ -59,7 +59,7 @@ const Profile = () => {
             lastName,
             color: selectedColor,
           },
-          { withCredentials: true }
+          { withCredentials: include }
         );
         if (response.status === 200 && response.data) {
           setUserInfo({ ...response.data });
@@ -78,7 +78,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append("profile-image", file);
       const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, {
-        withCredentials: true,
+        withCredentials: include,
       });
       if (response.status === 200 && response.data.image) {
         setUserInfo({ ...userInfo, image: response.data.image });
@@ -95,7 +95,7 @@ const Profile = () => {
   const handleDeleteImage = async () => {
     try {
       const response = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, {
-        withCredentials: true,
+        withCredentials: include,
       });
       if (response.status === 200) {
         setUserInfo({ ...userInfo, image: null });

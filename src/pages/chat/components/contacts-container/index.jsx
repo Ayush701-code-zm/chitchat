@@ -22,7 +22,7 @@ const ContactsContainer = () => {
   useEffect(() => {
     const getContactsWithMessages = async () => {
       const response = await apiClient.get(GET_CONTACTS_WITH_MESSAGES_ROUTE, {
-        withCredentials: true,
+        withCredentials: include,
       });
       if (response.data.contacts) {
         setDirectMessagesContacts(response.data.contacts);
@@ -34,7 +34,7 @@ const ContactsContainer = () => {
   useEffect(() => {
     const getChannels = async () => {
       const response = await apiClient.get(GET_USER_CHANNELS, {
-        withCredentials: true,
+        withCredentials: include,
       });
       if (response.data.channels) {
         setChannels(response.data.channels);

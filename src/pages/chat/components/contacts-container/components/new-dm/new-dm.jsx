@@ -33,7 +33,7 @@ const NewDM = () => {
         const response = await apiClient.post(
           SEARCH_CONTACTS_ROUTES,
           { searchTerm },
-          { withCredentials: true }
+          { withCredentials: include }
         );
         if (response.status === 200 && response.data.contacts) {
           setsearchedContacts(response.data.contacts);

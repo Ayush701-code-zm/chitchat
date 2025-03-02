@@ -35,7 +35,7 @@ const MessageContainer = () => {
         {
           id: selectedChatData._id,
         },
-        { withCredentials: true }
+        { withCredentials: include }
       );
 
       if (response.data.messages) {
@@ -45,7 +45,7 @@ const MessageContainer = () => {
     const getChannelMessages = async () => {
       const response = await apiClient.get(
         `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`,
-        { withCredentials: true }
+        { withCredentials: include }
       );
       if (response.data.messages) {
         setSelectedChatMessages(response.data.messages);
