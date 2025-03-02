@@ -30,13 +30,9 @@ const MessageContainer = () => {
 
   useEffect(() => {
     const getMessages = async () => {
-      const response = await apiClient.post(
-        FETCH_ALL_MESSAGES_ROUTE,
-        {
-          id: selectedChatData._id,
-        },
-        { withCredentials: include }
-      );
+      const response = await apiClient.post(FETCH_ALL_MESSAGES_ROUTE, {
+        id: selectedChatData._id,
+      });
 
       if (response.data.messages) {
         setSelectedChatMessages(response.data.messages);
@@ -44,8 +40,7 @@ const MessageContainer = () => {
     };
     const getChannelMessages = async () => {
       const response = await apiClient.get(
-        `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`,
-        { withCredentials: include }
+        `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`
       );
       if (response.data.messages) {
         setSelectedChatMessages(response.data.messages);

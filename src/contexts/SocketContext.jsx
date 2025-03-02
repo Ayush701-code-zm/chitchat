@@ -16,7 +16,6 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (userInfo) {
       socket.current = io(SOCKET_HOST, {
-        withCredentials: include,
         query: { userId: userInfo.id },
       });
       socket.current.on("connect", () => {
