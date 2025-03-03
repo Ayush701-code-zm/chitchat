@@ -31,7 +31,9 @@ function App() {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const response = await apiClient.get(GET_USERINFO_ROUTE, {});
+        const response = await apiClient.get(GET_USERINFO_ROUTE, {
+          withCredentials: true,
+        });
         if (response.status === 200 && response.data.id) {
           setUserInfo(response.data);
         } else {

@@ -45,7 +45,11 @@ const Auth = () => {
   const handleLogin = async () => {
     try {
       if (validateLogin()) {
-        const response = await apiClient.post(LOGIN_ROUTE, { email, password });
+        const response = await apiClient.post(
+          LOGIN_ROUTE,
+          { email, password },
+          { withCredentials: true }
+        );
         if (response.data.user.id) {
           setUserInfo(response.data.user);
           if (response.data.user.profileSetup) navigate("/chat");
@@ -62,10 +66,14 @@ const Auth = () => {
   const handleSignup = async () => {
     try {
       if (validateSignup()) {
-        const response = await apiClient.post(SIGNUP_ROUTE, {
-          email,
-          password,
-        });
+        const response = await apiClient.post(
+          SIGNUP_ROUTE,
+          {
+            email,
+            password,
+          },
+          { withCredentials: true }
+        );
         if (response.status === 201) {
           setUserInfo(response.data.user);
           navigate("/profile");

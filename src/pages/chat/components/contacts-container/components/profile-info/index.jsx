@@ -18,7 +18,11 @@ const ProfileInfo = () => {
   const navigate = useNavigate();
   const logout = async () => {
     try {
-      const response = await apiClient.post(LOGOUT_ROUTE, {});
+      const response = await apiClient.post(
+        LOGOUT_ROUTE,
+        {},
+        { withCredentials: true }
+      );
       if (response.status === 200) {
         navigate("/auth");
         setUserInfo(undefined);

@@ -52,11 +52,15 @@ const Profile = () => {
   const saveChanges = async () => {
     if (validateProfile()) {
       try {
-        const response = await apiClient.post(UPDATE_PROFLE_ROUTE, {
-          firstName,
-          lastName,
-          color: selectedColor,
-        });
+        const response = await apiClient.post(
+          UPDATE_PROFLE_ROUTE,
+          {
+            firstName,
+            lastName,
+            color: selectedColor,
+          },
+          { withCredentials: true }
+        );
         if (response.status === 200 && response.data) {
           setUserInfo({ ...response.data });
           toast.success("Profile Updated Successfully.");
@@ -73,11 +77,9 @@ const Profile = () => {
     if (file) {
       const formData = new FormData();
       formData.append("profile-image", file);
-      const response = await apiClient.post(
-        ADD_PROFILE_IMAGE_ROUTE,
-        formData,
-        {}
-      );
+      const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, {
+        withCredentials: true,
+      });
       if (response.status === 200 && response.data.image) {
         setUserInfo({ ...userInfo, image: response.data.image });
         toast.success("Image updated successfully.");
@@ -92,7 +94,9 @@ const Profile = () => {
 
   const handleDeleteImage = async () => {
     try {
-      const response = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, {});
+      const response = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         setUserInfo({ ...userInfo, image: null });
         toast.success("Image Removed Successfully.");

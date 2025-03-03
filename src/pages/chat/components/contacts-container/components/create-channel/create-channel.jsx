@@ -31,17 +31,23 @@ const CreateChannel = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const response = await apiClient.get(GET_ALL_CONTACTS, {});
+      const response = await apiClient.get(GET_ALL_CONTACTS, {
+        withCredentials: true,
+      });
       setAllContacts(response.data.contacts);
     };
     getData();
   }, []);
 
   const createChannel = async () => {
-    const response = await apiClient.post(CREATE_CHANNEL, {
-      name: channelName,
-      members: selectedContacts.map((contact) => contact.value),
-    });
+    const response = await apiClient.post(
+      CREATE_CHANNEL,
+      {
+        name: channelName,
+        members: selectedContacts.map((contact) => contact.value),
+      },
+      { withCredentials: true }
+    );
     if (response.status === 201) {
       setChannelName("");
       setSelectedContacts([]);
